@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 def TimeReversalCostate(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N):
 
@@ -45,7 +46,7 @@ def TimeReversalCostate(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N
             if k > 0:
                 u_b[i, :, :] = - (np.linalg.inv(R) @ B.T @ G_record[i, :, :] @ x_b_final.T).T
                 U_backward[k, i, :, :] = u_b[i, :, :].copy()
-            dX = (A @ x_b_final.T + B @ u_b[i, :, :].T).T * dt + (N_sigma @ back_noise.T).T + (D @ np.linalg.inv(Sigma_k_t[i,:,:]) @ (x_b_final - mean_repeated).T).T*dt
+            dX = (A @ x_b_final.T + B @ u_b[i, :, :].T).T * dt + (N_sigma @ back_noise.T).T + (D @ np.linalg.pinv(Sigma_k_t[i,:,:]) @ (x_b_final - mean_repeated).T).T*dt
             x_b_final = x_b_final - dX
             X_b[k, i-1, :, :] = x_b_final.copy()
 
@@ -55,15 +56,17 @@ def TimeReversalCostate(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N
         G_record = np.zeros((steps+1, 2, 2))
         for i in range(steps, 0, -1):
             x_b = X_b[k, i, :, :].copy()
-            G = (y_b_final.T @ x_b @ np.linalg.inv(x_b.T @ x_b))
+            # G = (y_b_final.T @ x_b @ np.linalg.pinv(x_b.T @ x_b))
+            G = (y_b_final.T @ x_b @ torch.pinverse(torch.from_numpy(x_b.T @ x_b)).numpy())
             G_record[i, :, :] = G.copy()
             back_noise = W_b[i, :, :].copy()
             mean = m_k_t[i, :].copy()
             mean_repeated = np.repeat(mean[:, np.newaxis], N, axis=1).T
-            minus_dY = (A.T @ y_b_final.T + Q @ x_b.T).T * dt - (G @ N_sigma @ back_noise.T).T - (G @ D @ np.linalg.inv(Sigma_k_t[i,:,:]) @ (x_b - mean_repeated).T).T*dt
+            minus_dY = (A.T @ y_b_final.T + Q @ x_b.T).T * dt - (G @ N_sigma @ back_noise.T).T - (G @ D @ np.linalg.pinv(Sigma_k_t[i,:,:]) @ (x_b - mean_repeated).T).T*dt
             y_b_final = y_b_final + minus_dY
             Y_b[k, i-1, :, :] = y_b_final.copy()
-        G = (y_b_final.T @ X_b[k,0,:,:] @ np.linalg.inv(X_b[k,0,:,:].T @ X_b[k,0,:,:]))
+        # G = (y_b_final.T @ X_b[k,0,:,:] @ np.linalg.pinv(X_b[k,0,:,:].T @ X_b[k,0,:,:]))
+        G = (y_b_final.T @ X_b[k,0,:,:] @ torch.pinverse(torch.from_numpy(X_b[k,0,:,:].T @ X_b[k,0,:,:])).numpy())
         G_record[0, :, :] = G.copy()
 
 

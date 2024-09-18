@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 def TimeReversalValue(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N):
 
@@ -78,7 +79,8 @@ def TimeReversalValue(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N):
             phi_3 = x_1 * x_2
             phi_4 = np.ones_like(x_1)
             phi_mat = np.concatenate((phi_1[:,np.newaxis], phi_2[:,np.newaxis], phi_3[:,np.newaxis], phi_4[:,np.newaxis]), axis=1)
-            alpha = np.linalg.pinv(phi_mat.T @ phi_mat) @ phi_mat.T @ y_b_final
+            alpha = torch.pinverse(torch.from_numpy(phi_mat.T @ phi_mat)).numpy() @ phi_mat.T @ y_b_final
+            # alpha = np.linalg.pinv(phi_mat.T @ phi_mat) @ phi_mat.T @ y_b_final
             G = np.array([[2*alpha[0,0], alpha[2,0]],[alpha[2,0], 2*alpha[1,0]]])
             G_record[i-1,:,:] = G.copy()
             v_x = (G @ x_pre.T).T

@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 
 def LeastSquareValue(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N):
@@ -56,7 +57,8 @@ def LeastSquareValue(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N):
             phi_3 = x_1 * x_2
             phi_4 = np.ones_like(phi_1)
             phi_mat = np.concatenate((phi_1[:,np.newaxis], phi_2[:,np.newaxis], phi_3[:,np.newaxis], phi_4[:,np.newaxis]), axis=1)
-            alpha = np.linalg.pinv(phi_mat.T @ phi_mat) @ phi_mat.T @ y_s
+            alpha = torch.pinverse(torch.from_numpy(phi_mat.T @ phi_mat)).numpy() @ phi_mat.T @ y_s
+            # alpha = np.linalg.pinv(phi_mat.T @ phi_mat) @ phi_mat.T @ y_s
             Alpha_records[k, i-1, :, :] = alpha.copy()
             y_c = phi_mat @ alpha
             Y_sample[k, i-1, :, :] = y_s.copy()

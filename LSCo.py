@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 def LeastSquareCostate(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N):
 
@@ -38,7 +39,8 @@ def LeastSquareCostate(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N)
             h = (Q @ x_b.T + A.T @ y_b.T).T
             y_s = y_b + h * dt
             phi_mat = X_f[k, i-1, :, :].copy()
-            alpha = y_s.T @ phi_mat @ np.linalg.inv(phi_mat.T @ phi_mat)
+            # alpha = y_s.T @ phi_mat @ np.linalg.pinv(phi_mat.T @ phi_mat)
+            alpha = y_s.T @ phi_mat @ torch.pinverse(torch.from_numpy(phi_mat.T @ phi_mat)).numpy()
             Alpha_records[k, i-1, :, :] = alpha.copy()
             y_c = (alpha @ phi_mat.T).T
             Y_sample[k, i-1, :, :] = y_s.copy()
