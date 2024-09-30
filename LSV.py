@@ -2,7 +2,7 @@ import numpy as np
 import torch
 
 
-def LeastSquareValue(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N, dim=2):
+def LeastSquareValue(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N):
     
     steps = int(T/dt)
     Gamma = np.linalg.inv(N_sigma) @ B
@@ -90,4 +90,6 @@ def LeastSquareValue(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N, d
     G[:, 0, 1] = alpha_final[:, 2, 0]
     G[:, 1, 0] = alpha_final[:, 2, 0]
     G[:, 1, 1] = alpha_final[:, 1, 0] * 2
-    return G
+
+   
+    return G, J

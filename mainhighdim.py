@@ -11,8 +11,8 @@ exp_num = 15 # experiment number
 dt = 0.02 # time step
 tf = 4 # time horizon
 noise_level = 1 # noise level
-kf = 200 # number of iterations
-dim_list = [2, 4, 6, 8] # dimension
+kf = 100 # number of iterations
+dim_list = [2, 4, 6, 8, 10, 20] # dimension
 N =1000 # sample number
 
 
@@ -108,34 +108,43 @@ for exp in range(exp_num):
         #         plt.plot(G_ref[:,i,j], linestyle='--', color='C0')
         #         plt.plot(G_TRV[:,i,j], color='C0')
         # plt.show()
-    
+
+
+
+
+
+
 print('LSV_MSE:', LSV_MSE)
 print('TRCo_MSE:', TRCo_MSE)
 print('LSCo_MSE:', LSCo_MSE)
 print('TRV_MSE:', TRV_MSE)
 # plot
-mean_LSV_MSE = np.mean(LSV_MSE, axis=0)
-mean_TRCo_MSE = np.mean(TRCo_MSE, axis=0)
-mean_LSCo_MSE = np.mean(LSCo_MSE, axis=0)
-mean_TRV_MSE = np.mean(TRV_MSE, axis=0)
-std_LSV_MSE = np.std(LSV_MSE, axis=0)
-std_TRCo_MSE = np.std(TRCo_MSE, axis=0)
-std_LSCo_MSE = np.std(LSCo_MSE, axis=0)
-std_TRV_MSE = np.std(TRV_MSE, axis=0)
-plt.figure()
-plt.fill_between(dim_list, mean_LSV_MSE - std_LSV_MSE, mean_LSV_MSE + std_LSV_MSE, color='C0', alpha=0.3)
-plt.fill_between(dim_list, mean_TRCo_MSE - std_TRCo_MSE, mean_TRCo_MSE + std_TRCo_MSE, color='C1', alpha=0.3)
-plt.fill_between(dim_list, mean_LSCo_MSE - std_LSCo_MSE, mean_LSCo_MSE + std_LSCo_MSE, color='C2', alpha=0.3)
-plt.fill_between(dim_list, mean_TRV_MSE - std_TRV_MSE, mean_TRV_MSE + std_TRV_MSE, color='C3', alpha=0.3)
-plt.plot(dim_list, mean_LSV_MSE, label='Least Square Value', color='C0')
-plt.plot(dim_list, mean_TRCo_MSE, label='Time Reversal Costate', color='C1')
-plt.plot(dim_list, mean_LSCo_MSE, label='Least Square Costate', color='C2')
-plt.plot(dim_list, mean_TRV_MSE, label='Time Reversal Value', color='C3')
-plt.xlabel('dimension')
-plt.ylabel('MSE')
-plt.yscale('log')
-plt.title('T={}, dt={}, sample={}'.format(tf, dt, N))
-plt.legend()
-plt.show()
+# mean_LSV_MSE = np.mean(LSV_MSE, axis=0)
+# mean_TRCo_MSE = np.mean(TRCo_MSE, axis=0)
+# mean_LSCo_MSE = np.mean(LSCo_MSE, axis=0)
+# mean_TRV_MSE = np.mean(TRV_MSE, axis=0)
+# std_LSV_MSE = np.std(LSV_MSE, axis=0)
+# std_TRCo_MSE = np.std(TRCo_MSE, axis=0)
+# std_LSCo_MSE = np.std(LSCo_MSE, axis=0)
+# std_TRV_MSE = np.std(TRV_MSE, axis=0)
+np.save('LSV_MSE_exp15_N1000.npy', LSV_MSE)
+np.save('TRCo_MSE_exp15_N1000.npy', TRCo_MSE)
+np.save('LSCo_MSE_exp15_N1000.npy', LSCo_MSE)
+np.save('TRV_MSE_exp15_N1000.npy', TRV_MSE)
+# plt.figure()
+# plt.fill_between(dim_list, mean_LSV_MSE - std_LSV_MSE, mean_LSV_MSE + std_LSV_MSE, color='C0', alpha=0.3)
+# plt.fill_between(dim_list, mean_TRCo_MSE - std_TRCo_MSE, mean_TRCo_MSE + std_TRCo_MSE, color='C1', alpha=0.3)
+# plt.fill_between(dim_list, mean_LSCo_MSE - std_LSCo_MSE, mean_LSCo_MSE + std_LSCo_MSE, color='C2', alpha=0.3)
+# plt.fill_between(dim_list, mean_TRV_MSE - std_TRV_MSE, mean_TRV_MSE + std_TRV_MSE, color='C3', alpha=0.3)
+# plt.plot(dim_list, mean_LSV_MSE, label='Least Square Value', color='C0')
+# plt.plot(dim_list, mean_TRCo_MSE, label='Time Reversal Costate', color='C1')
+# plt.plot(dim_list, mean_LSCo_MSE, label='Least Square Costate', color='C2')
+# plt.plot(dim_list, mean_TRV_MSE, label='Time Reversal Value', color='C3')
+# plt.xlabel('dimension')
+# plt.ylabel('MSE')
+# plt.yscale('log')
+# plt.title('T={}, dt={}, sample={}'.format(tf, dt, N))
+# plt.legend()
+# plt.show()
 
 
