@@ -8,7 +8,7 @@ from TRV import TimeReversalValue
 import time
 
 # Parameters
-exp_num = 15 # experiment number
+exp_num = 1 # experiment number
 # sample_list = [10, 50, 100, 500, 1000, 2000, 4000]  
 sample_list = [2000]
 # N = 1000 # sample number
@@ -56,7 +56,7 @@ for exp in range(exp_num):
         N_sigma = np.eye(2) * noise_level
         Q = np.eye(2)
         R = np.eye(1)
-        Q_f = np.eye(2) 
+        Q_f = np.eye(2)
         D = N_sigma @ N_sigma.T
         steps = int(T/dt)
 
@@ -75,46 +75,66 @@ for exp in range(exp_num):
             G_LSV, LSV_J = LeastSquareValue(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N)
             LSV_time.append(time.time() - LSV_start)
         except:
+            print('LSV failed')
             G_LSV = None
         try:
             TRCo_start = time.time()
             G_TRCo, TRCo_J = TimeReversalCostate(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N)
             TRCo_time.append(time.time() - TRCo_start)
         except:
+            print('TRCo failed')
             G_TRCo = None
         try:
             LSCo_start = time.time()
             G_LSCo, LSCo_J = LeastSquareCostate(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N)
             LSCo_time.append(time.time() - LSCo_start)
         except:
+            print('LSCo failed')
             G_LSCo = None
         try:
             TRV_start = time.time()
             G_TRV, TRV_J = TimeReversalValue(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N)
             TRV_time.append(time.time() - TRV_start)
         except:
+            print('TRV failed')
             G_TRV = None
 
         # solve Riccati equation
         G_ref = solve_riccati(A, B, Q, R, Q_f, T, dt).transpose(2,0,1)
 
+
+
+### Data Saving ###
+# plt.figure()
+# plt.plot(U_fv.mean(axis=1), label='forward')
+# plt.plot(U_bv.mean(axis=1), label='backward')
+# plt.show()
+# plt.figure()
+# for i in range(100):
+#     plt.plot(X_fco[kf-1, :, i, 0], color='b')
+#     plt.plot(X_fco[kf-1, :, i, 1], color='r')
+
+# plt.figure()
+# plt.plot(TRCo_J)
+# plt.title('TRCo cost')
+# plt.show()
         # MSE
-        if G_LSV is None:
-            LSV_MSE[exp, sample_index] = np.nan
-        else:
-            LSV_MSE[exp, sample_index] = np.mean((G_LSV - G_ref)**2)
-        if G_TRCo is None:
-            TRCo_MSE[exp, sample_index] = np.nan
-        else:
-            TRCo_MSE[exp, sample_index] = np.mean((G_TRCo - G_ref)**2)
-        if G_LSCo is None:
-            LSCo_MSE[exp, sample_index] = np.nan
-        else:
-            LSCo_MSE[exp, sample_index] = np.mean((G_LSCo - G_ref)**2)
-        if G_TRV is None:
-            TRV_MSE[exp, sample_index] = np.nan
-        else:
-            TRV_MSE[exp, sample_index] = np.mean((G_TRV - G_ref)**2)
+        # if G_LSV is None:
+        #     LSV_MSE[exp, sample_index] = np.nan
+        # else:
+        #     LSV_MSE[exp, sample_index] = np.mean((G_LSV - G_ref)**2)
+        # if G_TRCo is None:
+        #     TRCo_MSE[exp, sample_index] = np.nan
+        # else:
+        #     TRCo_MSE[exp, sample_index] = np.mean((G_TRCo - G_ref)**2)
+        # if G_LSCo is None:
+        #     LSCo_MSE[exp, sample_index] = np.nan
+        # else:
+        #     LSCo_MSE[exp, sample_index] = np.mean((G_LSCo - G_ref)**2)
+        # if G_TRV is None:
+        #     TRV_MSE[exp, sample_index] = np.nan
+        # else:
+        #     TRV_MSE[exp, sample_index] = np.mean((G_TRV - G_ref)**2)
 
         # plt.figure()
         # plt.plot(G_TRV[:,0,0])
@@ -131,23 +151,23 @@ for exp in range(exp_num):
 # print('TRCo_MSE: {}'.format(TRCo_MSE))
 # print('LSCo_MSE: {}'.format(LSCo_MSE))
 # print('TRV_MSE: {}'.format(TRV_MSE))
-# np.save('LSV_MSE_sample.npy', LSV_MSE)
-# np.save('TRCo_MSE_sample.npy', TRCo_MSE)
-# np.save('LSCo_MSE_sample.npy', LSCo_MSE)
-# np.save('TRV_MSE_sample.npy', TRV_MSE)
-# np.save('G_ref_T4_dt002_N2000.npy', G_ref)
-# np.save('G_LSV.npy', G_LSV)
-# np.save('G_TRCo.npy', G_TRCo)
-# np.save('G_LSCo.npy', G_LSCo)
-# np.save('G_TRV.npy', G_TRV)
+# np.save('LSV_MSE_T4_dt002_N2000_exp15.npy', LSV_MSE)
+# np.save('TRCo_MSE_T4_dt002_N2000_exp15.npy', TRCo_MSE)
+# np.save('LSCo_MSE_T4_dt002_N2000_exp15.npy', LSCo_MSE)
+# np.save('TRV_MSE_T4_dt002_N2000_exp15.npy', TRV_MSE)
+# np.save('G_ref_T4_dt002_N2000_exp15.npy', G_ref)
+# np.save('G_LSV_exp15.npy', G_LSV)
+# np.save('G_TRCo_exp15.npy', G_TRCo)
+# np.save('G_LSCo_exp15.npy', G_LSCo)
+# np.save('G_TRV_exp15.npy', G_TRV)
 # np.save('LSV_J.npy', LSV_J)
 # np.save('TRCo_J.npy', TRCo_J)
 # np.save('LSCo_J.npy', LSCo_J)
 # np.save('TRV_J.npy', TRV_J)
-np.savetxt('LSV_time.txt', LSV_time)
-np.savetxt('TRCo_time.txt', TRCo_time)
-np.savetxt('LSCo_time.txt', LSCo_time)
-np.savetxt('TRV_time.txt', TRV_time)
+# np.savetxt('LSV_time_exp15.txt', LSV_time)
+# np.savetxt('TRCo_time_exp15.txt', TRCo_time)
+# np.savetxt('LSCo_time_exp15.txt', LSCo_time)
+# np.savetxt('TRV_time_exp15.txt', TRV_time)
 
 
 # mean_LSV_MSE = np.mean(LSV_MSE, axis=0)
@@ -185,6 +205,10 @@ np.savetxt('TRV_time.txt', TRV_time)
 # plt.title('T={}, dt={}, sample={}'.format(T, dt, N))
 # plt.legend()
 # plt.show()
+# print(LSV_J)
+# print(TRCo_J)
+# print(LSCo_J)
+# print(TRV_J)
 # plt.figure()
 # plt.plot(np.arange(steps)*dt, G_LSV[:,0,0], color='C0')
 # plt.plot(np.arange(steps)*dt, G_ref[:,0,0], linestyle='--', color='C0')
@@ -211,7 +235,7 @@ np.savetxt('TRV_time.txt', TRV_time)
 # plt.xlabel('time step')
 # plt.ylabel('G')
 # plt.title('Time Reversal Costate, T={}, dt={}, sample={}'.format(T, dt, N))
-# # plt.show()
+# plt.show()
 
 # plt.figure()
 # plt.plot(np.arange(steps)*dt, G_LSCo[:,0,0], color='C0')

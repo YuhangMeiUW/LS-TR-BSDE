@@ -113,11 +113,11 @@ for exp in range(exp_num):
 
 
 
-
-print('LSV_MSE:', LSV_MSE)
-print('TRCo_MSE:', TRCo_MSE)
-print('LSCo_MSE:', LSCo_MSE)
-print('TRV_MSE:', TRV_MSE)
+### Data Saving ###
+# print('LSV_MSE:', LSV_MSE)
+# print('TRCo_MSE:', TRCo_MSE)
+# print('LSCo_MSE:', LSCo_MSE)
+# print('TRV_MSE:', TRV_MSE)
 # plot
 # mean_LSV_MSE = np.mean(LSV_MSE, axis=0)
 # mean_TRCo_MSE = np.mean(TRCo_MSE, axis=0)
@@ -127,10 +127,10 @@ print('TRV_MSE:', TRV_MSE)
 # std_TRCo_MSE = np.std(TRCo_MSE, axis=0)
 # std_LSCo_MSE = np.std(LSCo_MSE, axis=0)
 # std_TRV_MSE = np.std(TRV_MSE, axis=0)
-np.save('LSV_MSE_exp15_N1000.npy', LSV_MSE)
-np.save('TRCo_MSE_exp15_N1000.npy', TRCo_MSE)
-np.save('LSCo_MSE_exp15_N1000.npy', LSCo_MSE)
-np.save('TRV_MSE_exp15_N1000.npy', TRV_MSE)
+# np.save('LSV_MSE_exp15_N1000.npy', LSV_MSE)
+# np.save('TRCo_MSE_exp15_N1000.npy', TRCo_MSE)
+# np.save('LSCo_MSE_exp15_N1000.npy', LSCo_MSE)
+# np.save('TRV_MSE_exp15_N1000.npy', TRV_MSE)
 # plt.figure()
 # plt.fill_between(dim_list, mean_LSV_MSE - std_LSV_MSE, mean_LSV_MSE + std_LSV_MSE, color='C0', alpha=0.3)
 # plt.fill_between(dim_list, mean_TRCo_MSE - std_TRCo_MSE, mean_TRCo_MSE + std_TRCo_MSE, color='C1', alpha=0.3)

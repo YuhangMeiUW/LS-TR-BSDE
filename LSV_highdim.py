@@ -57,10 +57,13 @@ def LeastSquareValue_highdim(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, 
     # Cost
     J = np.zeros((kf, 1))
     for k in range(kf):
-        x_mean = X_f[k, :, :, :].mean(axis=1)
-        u_mean = U_forward[k, :, :, :].mean(axis=1)
-        J[k] = 0.5 * ((x_mean @ Q * x_mean).sum() + (u_mean @ R * u_mean).sum()) * dt
-        J[k] += 0.5 * ((x_mean[-1,:] @ Q_f * x_mean[-1,:]).sum()) * (1-dt)
+        # x_mean = X_f[k, :, :, :].mean(axis=1)
+        # u_mean = U_forward[k, :, :, :].mean(axis=1)
+        # J[k] = 0.5 * ((x_mean @ Q * x_mean).sum() + (u_mean @ R * u_mean).sum()) * dt
+        # J[k] += 0.5 * ((x_mean[-1,:] @ Q_f * x_mean[-1,:]).sum()) * (1-dt)
+        J[k] += 0.5 * (X_f[k,:,:,:] @ Q * X_f[k,:,:,:]).mean(axis=1).sum() * dt
+        J[k] += 0.5 * (U_forward[k,:,:,:] @ R * U_forward[k,:,:,:]).mean(axis=1).sum() * dt
+        J[k] += 0.5 * (X_f[k,-1,:,:] @ Q_f * X_f[k,-1,:,:]).mean(axis=0).sum() * (1-dt)
 
     G = G_record[kf-1, :, :, :].copy()
     return G
