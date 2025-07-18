@@ -38,7 +38,7 @@ The new control law is used to run the algorithm again, and this procedure is re
 
 
 ## Setup
-* Python/Numpy,Scipy,Matplotlib
+* Python/ Numpy, Scipy, Matplotlib
 * Pytorch
 
 ## Running the code and regenerating data and figures.
