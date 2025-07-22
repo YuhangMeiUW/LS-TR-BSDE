@@ -3,7 +3,6 @@ import torch
 
 
 def LeastSquareValue(A, B, Noise_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf, N):
-
     """
     Perform the Least square monte carlo Value method for a linear quadratic model
 
