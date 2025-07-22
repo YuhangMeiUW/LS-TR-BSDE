@@ -6,11 +6,12 @@ def TimeReversalCostate_highdim(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_
     steps = int(T/dt)
 
     # Data storage
-    X_f = np.zeros((kf, steps+1, N, dim))
-    X_b = np.zeros((kf, steps+1, N, dim))
-    Y_b = np.zeros((kf, steps+1, N, dim))
-    U_forward = np.zeros((kf+1, steps+1, N, int(dim/2)))
-    U_backward = np.zeros((kf+1, steps+1, N, int(dim/2)))
+    X_f = np.zeros((kf, steps+1, N, dim)) # Forward state trajectory
+    X_b = np.zeros((kf, steps+1, N, dim)) # Backward state trajectory
+    Y_b = np.zeros((kf, steps+1, N, dim)) # Backward costate trajectory
+    U_forward = np.zeros((kf+1, steps+1, N, int(dim/2))) # Forward control input
+    U_backward = np.zeros((kf+1, steps+1, N, int(dim/2))) # Backward control input
+    J = np.zeros((kf, 1)) # Cost for each iteration
     
 
     for k in range(kf):
@@ -70,15 +71,10 @@ def TimeReversalCostate_highdim(A, B, N_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_
         G_record[0, :, :] = G.copy()
 
 
-    # Cost
-    J = np.zeros((kf, 1))
-    for k in range(kf):
-        # x_mean = X_f[k, :, :, :].mean(axis=1)
-        # u_mean = U_forward[k, :, :, :].mean(axis=1)
-        # J[k] = 0.5 * ((x_mean @ Q * x_mean).sum() + (u_mean @ R * u_mean).sum()) * dt
-        # J[k] += 0.5 * ((x_mean[-1,:] @ Q_f * x_mean[-1,:]).sum()) * (1-dt)
+        # Cost calculation
+    
         J[k] += 0.5 * (X_f[k,:,:,:] @ Q * X_f[k,:,:,:]).mean(axis=1).sum() * dt
         J[k] += 0.5 * (U_forward[k,:,:,:] @ R * U_forward[k,:,:,:]).mean(axis=1).sum() * dt
-        J[k] += 0.5 * (X_f[k,-1,:,:] @ Q_f * X_f[k,-1,:,:]).mean(axis=0).sum() * (1-dt)
+        J[k] += 0.5 * (X_f[k,-1,:,:] @ Q_f * X_f[k,-1,:,:]).mean(axis=0).sum() 
     
     return G_record[1:, :, :]
