@@ -23,6 +23,14 @@ stability_list = [-1, -0.1, 0, 0.1, 1, 2] # stability
 
 # Noise
 def noise(dt, N):
+    """
+    Generate noise for the system.
+    Args:
+        dt (float): Time step size.
+        N (int): Number of samples.
+    Returns:
+        np.ndarray: Noise samples of shape (N, 2).
+    """
     return np.random.multivariate_normal(np.zeros(2), dt*np.eye(2), N)
 
 
