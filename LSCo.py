@@ -31,7 +31,7 @@ def LeastSquareCostate(A, B, Noise_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, kf
     Y_corrected = np.zeros((kf, steps+1, N, 2)) # Corrected costate trajectory
     U_forward = np.zeros((kf+1, steps+1, N, 1)) # Forward control input
     Z_backward = np.zeros((kf, steps+1, 2, 2)) # Z term in BSDE
-    Alpha_records = np.zeros((kf, steps, 2, 2)) # basis function coefficients
+    Alpha_records = np.zeros((kf, steps, 2, 2)) # Riccati matrix
     J = np.zeros((kf, 1)) # Cost for each iteration
 
     for k in range(kf):
