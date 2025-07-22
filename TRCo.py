@@ -50,7 +50,8 @@ def TimeReversalCostate(A, B, Noise_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, k
                 # Feedback control input 
                 u_f[i, :, :] = - (np.linalg.inv(R) @ B.T @ G_record[i, :, :] @ x.T).T
                 U_forward[k, i, :, :] = u_f[i, :, :]
-            dx = (A @ x.T + B @ u_f[i, :, :].T).T * dt + (Noise_sigma @ W_f[i, :, :].T).T
+            forward_noise = W_f[i, :, :]
+            dx = (A @ x.T + B @ u_f[i, :, :].T).T * dt + (Noise_sigma @ forward_noise.T).T
             x = x + dx
             X_f[k, i+1, :, :] = x.copy()
          
@@ -65,8 +66,8 @@ def TimeReversalCostate(A, B, Noise_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, k
         x_b = np.random.multivariate_normal(m_final, Sigma_final, N)
         X_b[k, -1, :, :] = x_b.copy()
         for i in range(steps, 0, -1):
-            back_noise = W_b[i, :, :].copy()
-            mean = m_k_t[i, :].copy()
+            back_noise = W_b[i, :, :]
+            mean = m_k_t[i, :]
             mean_repeated = np.repeat(mean[:, np.newaxis], N, axis=1).T
             if k > 0:
                 # Feedback control input
