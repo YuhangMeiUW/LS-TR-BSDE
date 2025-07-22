@@ -31,25 +31,30 @@ def TimeReversalCostate(A, B, Noise_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, k
     Y_b = np.zeros((kf, steps+1, N, 2)) # Backward costate trajectory
     U_forward = np.zeros((kf+1, steps+1, N, 1)) # Forward control input
     U_backward = np.zeros((kf+1, steps+1, N, 1)) # Backward control input
+    J = np.zeros((kf, 1)) # Cost for each iteration
     
 
     for k in range(kf):
 
-        u_f = U_forward[k, :, :, :]
-        u_b = U_backward[k, :, :, :]
         x = X_0.copy()
         X_f[k, 0, :, :] = x.copy()
+        
+        if k == 0:
+            # In first iteration use zero control input
+            u_f = np.zeros((steps+1, N, 1))  # Forward control input
+            u_b = np.zeros((steps+1, N, 1))  # Backward control input
 
         # Forward pass
         for i in range(steps):
             if k > 0:
+                # Feedback control input 
                 u_f[i, :, :] = - (np.linalg.inv(R) @ B.T @ G_record[i, :, :] @ x.T).T
                 U_forward[k, i, :, :] = u_f[i, :, :]
             dx = (A @ x.T + B @ u_f[i, :, :].T).T * dt + (Noise_sigma @ W_f[i, :, :].T).T
             x = x + dx
             X_f[k, i+1, :, :] = x.copy()
          
-        # Folmer drift
+        # Follmer drift
         m_k_t = X_f[k, :, :, :].mean(axis=1)
         x_minus_m = X_f[k, :, :, :] - np.repeat(m_k_t[:, np.newaxis], N, axis=1)
         Sigma_k_t = np.einsum('tni,tnj->tij', x_minus_m, x_minus_m) / N
@@ -64,9 +69,11 @@ def TimeReversalCostate(A, B, Noise_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, k
             mean = m_k_t[i, :].copy()
             mean_repeated = np.repeat(mean[:, np.newaxis], N, axis=1).T
             if k > 0:
+                # Feedback control input
                 u_b[i, :, :] = - (np.linalg.inv(R) @ B.T @ G_record[i, :, :] @ x_b.T).T
                 U_backward[k, i, :, :] = u_b[i, :, :].copy()
-            dx = (A @ x_b.T + B @ u_b[i, :, :].T).T * dt + (Noise_sigma @ back_noise.T).T + (D @ np.linalg.pinv(Sigma_k_t[i,:,:]) @ (x_b - mean_repeated).T).T*dt
+            follmer = (D @ np.linalg.pinv(Sigma_k_t[i,:,:]) @ (x_b - mean_repeated).T).T
+            dx = (A @ x_b.T + B @ u_b[i, :, :].T).T * dt + (Noise_sigma @ back_noise.T).T + follmer * dt
             x_b = x_b - dx
             X_b[k, i-1, :, :] = x_b.copy()
 
@@ -90,12 +97,10 @@ def TimeReversalCostate(A, B, Noise_sigma, Q, R, Q_f, D, T, dt, X_0, W_f, W_b, k
         G_record[0, :, :] = G.copy()
 
 
-    ### Cost calculation ###
-    J = np.zeros((kf, 1))
-    for k in range(kf):
+        ### Cost calculation ###
         J[k] += 0.5 * (X_f[k,:,:,:] @ Q * X_f[k,:,:,:]).mean(axis=1).sum() * dt
         J[k] += 0.5 * (U_forward[k,:,:,:] @ R * U_forward[k,:,:,:]).mean(axis=1).sum() * dt
-        J[k] += 0.5 * (X_f[k,-1,:,:] @ Q_f * X_f[k,-1,:,:]).mean(axis=0).sum() * (1-dt)
+        J[k] += 0.5 * (X_f[k,-1,:,:] @ Q_f * X_f[k,-1,:,:]).mean(axis=0).sum() 
     
     G = G_record[1:, :, :]
     return G, J
